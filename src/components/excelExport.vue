@@ -1,26 +1,26 @@
 <script setup lang="ts">
 import Excel from 'Exceljs';
-import {computed, ref} from "vue";
-import {array2obj} from "./excelUtils";
+import { computed, ref } from "vue";
+import { array2obj } from "./excelUtils";
 
 
 export interface Props {
-  headerConfig: Array<{name:string,code:string}>
+  headerConfig: Array<{ name: string, code: string }>
 }
 
 const props = withDefaults(defineProps<Props>(), {
   headerConfig: () => [{
-    name:"蟹卡卡号",
-    code:"cardCode"
-  },{
-    name:"蟹卡卡密",
-    code:"cardPwd"
-  },{
-    name:"套餐详情",
-    code:"cardDetail"
-  },{
-    name:"总价值",
-    code:"allCost"
+    name: "蟹卡卡号",
+    code: "cardCode"
+  }, {
+    name: "蟹卡卡密",
+    code: "cardPwd"
+  }, {
+    name: "套餐详情",
+    code: "cardDetail"
+  }, {
+    name: "总价值",
+    code: "allCost"
   }
   ]
 })
@@ -31,19 +31,19 @@ const sheets = ref<Excel.Worksheet[]>([])
 
 
 // 取第一项的tab
-const curryTab = computed(()=>{
+const curryTab = computed(() => {
   return sheets.value[0] || []
 })
 
-const curryHeader = computed(()=>{
+const curryHeader = computed(() => {
   return sheets.value?.[0]?.getRow(1)?.values || []
 })
 
-const curryData = computed(()=>{
+const curryData = computed(() => {
   // eachRow(callback: (row: Row, rowNumber: number) => void): void;
   const result: any[] = []
-  sheets.value?.[0]?.eachRow((row: Excel.Row, rowNumber: number)=>{
-    if( rowNumber !== 1){
+  sheets.value?.[0]?.eachRow((row: Excel.Row, rowNumber: number) => {
+    if (rowNumber !== 1) {
       result.push(row.values)
     }
   })
@@ -57,7 +57,7 @@ const curryData = computed(()=>{
 const pickerOpts = {
   multiple: false
 };
-const handleGetFile = async ()=>{
+const handleGetFile = async () => {
   const [fileHandle] = await window.showOpenFilePicker(pickerOpts);
   // 获取文件内容
   const fileData = await fileHandle.getFile();
@@ -67,11 +67,11 @@ const handleGetFile = async ()=>{
   sheets.value = filterName(workbook.worksheets);
 }
 
-function readFile(file:File):Promise<ArrayBuffer> {
+function readFile(file: File): Promise<ArrayBuffer> {
   return new Promise((resolve, reject) => {
     const fr = new FileReader()
     fr.onload = () => {
-      if(fr.result instanceof ArrayBuffer){
+      if (fr.result instanceof ArrayBuffer) {
         resolve(fr.result)
       } else {
         reject();
@@ -87,14 +87,14 @@ function readFile(file:File):Promise<ArrayBuffer> {
  * 筛选tab
  * @param Worksheets
  */
-function filterName(Worksheets: Excel.Worksheet[]): Excel.Worksheet[]{
+function filterName(Worksheets: Excel.Worksheet[]): Excel.Worksheet[] {
   return Worksheets.filter(
-      (worksheet)=>{
-        if(["模版"].includes(worksheet.name)){
-          return false
-        }
-        return true
+    (worksheet) => {
+      if (["模版"].includes(worksheet.name)) {
+        return false
       }
+      return true
+    }
   )
 }
 
@@ -102,9 +102,8 @@ function filterName(Worksheets: Excel.Worksheet[]): Excel.Worksheet[]{
 /**
  * 处理转换
  */
-const handleShowTable=()=>{
-  const all = array2obj(props.headerConfig,curryHeader.value,curryData.value)
-  console.log("all",all)
+const handleShowTable = () => {
+  const all = array2obj(props.headerConfig, curryHeader.value, curryData.value)
 }
 
 
@@ -117,9 +116,9 @@ const handleShowTable=()=>{
 
     <button type="button" @click="handleShowTable">展示</button>
 
-    curryHeader:{{curryHeader}}
+    curryHeader:{{ curryHeader }}
 
-    curryData:{{curryData}}
+    curryData:{{ curryData }}
   </div>
 </template>
 
